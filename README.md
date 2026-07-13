@@ -1,6 +1,6 @@
 # Axiom‑4
 
-Axiom‑4 ist die Vereinigung der drei RESPO‑Axiome:
+Axiom‑4 vereint die drei RESPO‑Axiome:
 
 - RESPO‑ROOT
 - RESPO‑ACHSE
