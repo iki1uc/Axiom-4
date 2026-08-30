@@ -1,6 +1,84 @@
-TMP‑RESPO:
-TMP
-TMP‑LAGE
-16x16
-8x8
-CODE
+export const A4_CPU = {
+
+  // --------------------------------------------------
+  // 1) Axiom-4 Position (ROOT + ACHSE + TMP)
+  // --------------------------------------------------
+  position() {
+    return {
+      root: "ROOT-0",
+      achse: "AXIS-A",
+      tmp: "TMP-A",
+      layer: [3, 6, 9],
+      valid: true
+    };
+  },
+
+  // --------------------------------------------------
+  // 2) Treffer-Lernsystem (3hit90)
+  // --------------------------------------------------
+  memory: {
+    hits: 0,
+    misses: 0,
+    slides: [],
+    jumps: []
+  },
+
+  hit(slide, jump) {
+    this.memory.hits++;
+    this.memory.slides.push(slide);
+    this.memory.jumps.push(jump);
+  },
+
+  miss(slide, jump) {
+    this.memory.misses++;
+    this.memory.slides.push(slide);
+    this.memory.jumps.push(jump);
+  },
+
+  quote() {
+    const h = this.memory.hits;
+    const m = this.memory.misses;
+    return h + m === 0 ? 0 : h / (h + m);
+  },
+
+  // --------------------------------------------------
+  // 3) CPU-Sprung-Vorhersage (AIR/AIV)
+  // --------------------------------------------------
+  predictCPU(axis) {
+    const pos = this.position();
+    const q = this.quote();
+
+    return {
+      axis,
+      pos,
+      quote: q,
+      jump_bias: q > 0.55 ? "FORWARD" : "REVERSE",
+      tmp128: true
+    };
+  },
+
+  // --------------------------------------------------
+  // 4) Gewinnorientierter Sprung
+  // --------------------------------------------------
+  jump(axis) {
+    const p = this.predictCPU(axis);
+
+    // Nur springen, wenn gewinnbringend
+    if (p.quote > 0.6 && p.pos.valid) {
+      return {
+        active: true,
+        mode: "WIN-JUMP",
+        axis,
+        bias: p.jump_bias,
+        quote: p.quote
+      };
+    }
+
+    return {
+      active: false,
+      mode: "HOLD",
+      axis,
+      quote: p.quote
+    };
+  }
+};
