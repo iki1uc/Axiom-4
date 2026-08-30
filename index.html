@@ -166,7 +166,12 @@
 // ============================================================
 
 const engine = {
-
+// 1) Orbit‑Module (meine neuen)
+  orbitFusion() { ... },
+  pumpKernel() { ... },
+  predictiveEngine() { ... },
+  windowEngine() { ... },
+  loopAll() { ... },
   // ---------- KERNEL ----------
   state: {
     score: 1000,
@@ -216,15 +221,7 @@ const engine = {
     if (el.children.length > 30) el.removeChild(el.firstChild);
   },
 
-  // ---------- RENDER ----------
-  render() {
-    this.renderAxles();
-    this.renderPrefetch();
-    this.renderLiveWindow();
-    this.updateStatus();
-    this.updateMystery();
-    this.updateCPU();
-    this.renderResult();
+ 
   },
 
   renderAxles() {
@@ -264,7 +261,15 @@ const engine = {
       });
     });
   },
-
+// 2) Render‑Module (deine)
+  render() { ... },
+  renderAxles() { ... },
+  renderPrefetch() { ... },
+  renderLiveWindow() { ... },
+  updateStatus() { ... },
+  updateMystery() { ... },
+  updateCPU() { ... },
+  renderResult() { ... },
   updateStatus() {
     document.getElementById('scoreVal').textContent = this.state.score;
     document.getElementById('pumpVal').textContent = this.state.pump;
@@ -295,18 +300,18 @@ const engine = {
     el.textContent = `
 MASSSNAHME · IKI1UC
 ─────────────────
-AKTIVE ACHSEN: ${active}/9
-PUMP-STACK: ${p} / 128
-TREFFERQUOTE: ${q}%
-CPU-PREDICT: ${this.state.predict}
-BIAS: ${this.state.cpuBias}
-SPRUNG: ${this.state.cpuJump}
-ROOT: ${this.state.root}
-ACHSE: ${this.state.achse}
-TMP: ${this.state.tmp}
-Q: ${this.state.q}  D: ${this.state.d}  F: ${this.state.f}
-    `;
-  },
+// 3) Action‑Module (deine)
+  toggleAxle() { ... },
+  pumpCycle() { ... },
+  triggerPredict() { ... },
+  runGeneral() { ... },
+  toggleAll() { ... },
+  randomize() { ... },
+  resetAll() { ... },
+
+  // 4) Init (deine)
+  init() { ... }
+};
 
   // ---------- ACHSEN ----------
   toggleAxle(i) {
