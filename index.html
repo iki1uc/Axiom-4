@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IKI1UC · Axiom‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG · REPARIERT</title>
+    <title>IKI1UC · Axiom‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG · FINAL</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a12;color:#d0d9e6;font-family:'Consolas',monospace;padding:10px;min-height:100vh}
@@ -43,7 +43,7 @@
 <body>
 
 <h1>⚡ IKI1UC · AXIOM‑4 · INDUSTRY PUMP</h1>
-<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREDICTIVE SPRUNG · 3×2 PREFETCH · REPARIERT, LAUFFÄHIG</h1>
+<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREDICTIVE SPRUNG · 3×2 PREFETCH · FINAL · ALLE MODULE AKTIV</h1>
 
 <div class="grid2">
   <div>
@@ -55,6 +55,7 @@
         <button class="sec" id="btnToggleAll">🔄 ALL TOGGLE</button>
         <button id="btnRandom">🎲 RANDOM</button>
         <button id="btnPump">💨 PUMP</button>
+        <button id="btnLoop">♾ LOOP ALL</button>
       </div>
     </div>
 
@@ -133,8 +134,7 @@
 <script>
 // ============================================================
 // IKI1UC · AXIOM‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG
-// REPARIERT: keine Platzhalter "{ ... }", keine doppelten Keys,
-// kein Code außerhalb des Objekts, Template-String korrekt geschlossen.
+// FINAL · ALLE MODULE IMPLEMENTIERT
 // ============================================================
 const engine = {
 
@@ -160,16 +160,6 @@ const engine = {
   liveWindow: [['3','9'], ['27','81'], ['243','729']],
   memory: { hits: 0, misses: 0, slides: [], jumps: [] },
 
-  // ---------- TODO: ohne echten Inhalt in der Originaldatei ----------
-  // Diese 5 Funktionen kamen in deinem Code nur als "{ ... }" vor,
-  // ohne jemals eine echte Implementierung zu haben. Ich habe hier
-  // NICHTS erfunden — sag mir, was sie tun sollen, dann bau ich sie.
-  orbitFusion() { this.log('⚠️ orbitFusion: noch nicht implementiert (kein Original-Code vorhanden)', 'warn'); },
-  pumpKernel() { this.log('⚠️ pumpKernel: noch nicht implementiert (kein Original-Code vorhanden)', 'warn'); },
-  predictiveEngine() { this.log('⚠️ predictiveEngine: noch nicht implementiert (kein Original-Code vorhanden)', 'warn'); },
-  windowEngine() { this.log('⚠️ windowEngine: noch nicht implementiert (kein Original-Code vorhanden)', 'warn'); },
-  loopAll() { this.log('⚠️ loopAll: noch nicht implementiert (kein Original-Code vorhanden)', 'warn'); },
-
   // ---------- LOG ----------
   log(msg, type = 'info') {
     const el = document.getElementById('consoleLog');
@@ -180,7 +170,105 @@ const engine = {
     if (el.children.length > 30) el.removeChild(el.firstChild);
   },
 
-  // ---------- RENDER ----------
+  // ============================================================
+  // ⭐ AXIOM 1 — ORBIT-MODULE (voll implementiert)
+  // ============================================================
+
+  // ─── ORBIT‑FUSION ───
+  orbitFusion() {
+    const active = this.axles.filter(a => a.active).length;
+    this.state.root = active;
+    this.state.achse = active > 0 ? String.fromCharCode(64 + active) : '0';
+    this.state.tmp = 128 - this.state.pump;
+
+    this.state.q = 3 * active + (this.state.pump % 7);
+    this.state.d = 9 * active + Math.floor(this.state.pump / 4);
+    this.state.f = 27 * active + Math.floor(this.state.pump / 2);
+
+    this.state.cpuJump = active + Math.floor(this.state.pump / 8);
+    this.state.cpuBias = this.state.quote > 0.6 ? 'FORWARD' : 'REVERSE';
+    this.state.predict = active > 0 ? 'ACTIVE' : 'IDLE';
+
+    const vals = [3,9,27,81,243,729];
+    const shift = (active + this.state.pump) % 6;
+    this.liveWindow = [
+      [vals[(shift)%6], vals[(shift+1)%6]],
+      [vals[(shift+2)%6], vals[(shift+3)%6]],
+      [vals[(shift+4)%6], vals[(shift+5)%6]]
+    ];
+
+    this.log(`🌀 ORBIT-FUSION · active=${active} · pump=${this.state.pump}`, 'info');
+    this.render();
+  },
+
+  // ─── PUMP‑KERNEL ───
+  pumpKernel() {
+    const active = this.axles.filter(a => a.active).length;
+    if (active === 0) return;
+
+    this.stations.forEach((s, i) => {
+      if ((this.state.pump + i) % 3 === 0) {
+        this.log(`🔷 STATION ${s} → BOOST`, 'ok');
+        this.state.score += (active * (i + 1));
+      }
+    });
+
+    this.state.pump += active;
+    this.state.quote = Math.min(1, this.state.quote + active * 0.005);
+    this.orbitFusion();
+  },
+
+  // ─── PREDICTIVE‑ENGINE ───
+  predictiveEngine() {
+    const active = this.axles.filter(a => a.active).length;
+    if (active === 0) {
+      this.state.predict = 'IDLE';
+      this.state.cpuJump = 0;
+      this.log('⏸ PREDICTIVE · idle', 'info');
+      return;
+    }
+
+    const bias = this.state.quote > 0.6 ? 'FORWARD' : 'REVERSE';
+    const jump = active + Math.floor(this.state.pump / 6);
+
+    this.state.cpuBias = bias;
+    this.state.cpuJump = jump;
+    this.state.predict = 'ACTIVE';
+
+    this.memory.hits += 1;
+    this.memory.slides.push(active);
+    this.memory.jumps.push(jump);
+    this.state.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
+
+    this.log(`🧠 SPRUNG · ${bias} · jump=${jump} · quote=${Math.round(this.state.quote*100)}%`, 'warn');
+    this.orbitFusion();
+  },
+
+  // ─── WINDOW‑ENGINE ───
+  windowEngine() {
+    const vals = [3,9,27,81,243,729];
+    const shift = (this.state.root + this.state.pump + this.state.cpuJump) % 6;
+    this.liveWindow = [
+      [vals[(shift)%6], vals[(shift+1)%6]],
+      [vals[(shift+2)%6], vals[(shift+3)%6]],
+      [vals[(shift+4)%6], vals[(shift+5)%6]]
+    ];
+    this.renderLiveWindow();
+  },
+
+  // ─── LOOP‑ALL ───
+  loopAll() {
+    this.axles.forEach(a => a.active = !a.active);
+    this.pumpKernel();
+    this.predictiveEngine();
+    this.windowEngine();
+    this.render();
+    this.log('♾ LOOP-ALL · orbit complete', 'ok');
+  },
+
+  // ============================================================
+  // ⭐ AXIOM 2 — RENDER-MODULE
+  // ============================================================
   render() {
     this.renderAxles();
     this.renderPrefetch();
@@ -253,16 +341,23 @@ const engine = {
     const p = this.state.pump;
     const q = Math.round(this.state.quote * 100);
     el.textContent =
-`MASSNAHME · IKI1UC
+`MASSSNAHME · IKI1UC
 ─────────────────
 aktive Achsen : ${active} / 9
 Pump-Stack    : ${p} / 128
 Trefferquote  : ${q}%
 Predict       : ${this.state.predict}
-Sprung        : ${this.state.cpuJump}`;
+Sprung        : ${this.state.cpuJump}
+Bias          : ${this.state.cpuBias}
+ROOT          : ${this.state.root}
+ACHSE         : ${this.state.achse}
+TMP           : ${this.state.tmp}
+Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}`;
   },
 
-  // ---------- ACHSEN ----------
+  // ============================================================
+  // ⭐ AXIOM 3 — ACTION-MODULE
+  // ============================================================
   toggleAxle(i) {
     this.axles[i].active = !this.axles[i].active;
     const active = this.axles.filter(a => a.active).length;
@@ -273,7 +368,6 @@ Sprung        : ${this.state.cpuJump}`;
     this.triggerPredict();
   },
 
-  // ---------- PUMP ----------
   pumpCycle() {
     const active = this.axles.filter(a => a.active).length;
     if (active === 0) {
@@ -297,7 +391,6 @@ Sprung        : ${this.state.cpuJump}`;
     this.triggerPredict();
   },
 
-  // ---------- PREDICTIVE ----------
   triggerPredict() {
     const active = this.axles.filter(a => a.active).length;
     const quote = this.state.quote;
@@ -374,10 +467,12 @@ Sprung        : ${this.state.cpuJump}`;
     this.render();
   },
 
+  // ---------- INIT ----------
   init() {
-    this.log('🚀 AXIOM‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG', 'ok');
+    this.log('🚀 AXIOM‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG · FINAL', 'ok');
     this.log('📊 9 ACHSEN · 3×2 PREFETCH · MYSTERY Q/D/F', 'info');
     this.log('💨 PUMP · CPU‑PREDICT · TREFFERQUOTE', 'info');
+    this.log('🌀 ORBIT‑FUSION · PUMP‑KERNEL · WINDOW‑ENGINE · LOOP‑ALL', 'ok');
     this.render();
     setTimeout(() => this.triggerPredict(), 500);
     setInterval(() => {
@@ -386,15 +481,17 @@ Sprung        : ${this.state.cpuJump}`;
   }
 };
 
+// ---------- BUTTONS ----------
 document.getElementById('btnGeneral').addEventListener('click', () => engine.runGeneral());
 document.getElementById('btnReset').addEventListener('click', () => engine.resetAll());
 document.getElementById('btnToggleAll').addEventListener('click', () => engine.toggleAll());
 document.getElementById('btnRandom').addEventListener('click', () => engine.randomize());
 document.getElementById('btnPump').addEventListener('click', () => engine.pumpCycle());
+document.getElementById('btnLoop').addEventListener('click', () => engine.loopAll());
 
+// ---------- START ----------
 engine.init();
 window.engine = engine;
 </script>
-
 </body>
 </html>
