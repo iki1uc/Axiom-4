@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE · VEREINHEITLICHT</title>
+    <title>3‑STERNE · GENERAL · ERWEITERT · AXIOM‑MODULE</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a12;color:#d0d9e6;font-family:'Consolas',monospace;padding:10px;min-height:100vh}
@@ -23,6 +23,8 @@
         pre{background:rgba(0,0,0,0.4);padding:8px;border-radius:6px;border:1px solid rgba(0,200,255,0.05);font-size:9px;line-height:1.3;white-space:pre-wrap;color:#8ab4c8;margin:4px 0;max-height:120px;overflow:auto}
         .badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;margin:0 2px}
         .badge.info{background:#0a1a2a;color:#66ccff}
+        .badge.gold{background:#2a1a0a;color:#ffd700}
+        .badge.green{background:#0a2a1a;color:#6bffa9}
         .status-row{display:flex;flex-wrap:wrap;gap:6px;font-size:9px;margin:3px 0;color:#5a7a8a}
         .status-row span{background:rgba(255,255,255,0.02);padding:2px 6px;border-radius:3px}
         .console{background:#0a0a0a;padding:6px;border-radius:4px;font-size:7px;color:#3d5a70;max-height:80px;overflow-y:auto;border:1px solid #111}
@@ -44,12 +46,21 @@
         .metric .value{font-size:16px;font-weight:bold;color:#6bffa9}
         .metric .value.gold{color:#ffd700}
         .metric .value.info{color:#66ccff}
+        .station-grid{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0}
+        .station-pill{background:#0a0a0a;padding:2px 8px;border-radius:10px;font-size:7px;border:1px solid #1a1a2a;color:#3d5a70;transition:0.3s}
+        .station-pill.boost{background:#0a2a1a;color:#6bffa9;border-color:#6bffa9;box-shadow:0 0 12px rgba(107,255,169,0.2)}
+        .history-list{font-size:7px;color:#3d5a70;max-height:60px;overflow-y:auto;line-height:1.5}
+        .history-list .score-entry{color:#ffd700}
+        .trend-up{color:#6bffa9}
+        .trend-down{color:#ff6b8a}
+        .trend-flat{color:#ffd700}
+        input[type="number"]{background:#0a0a0a;color:#0f0;border:1px solid #1a1a2a;padding:2px 6px;font-family:monospace;font-size:9px;width:60px;border-radius:3px}
     </style>
 </head>
 <body>
 
 <h1>⭐ 3‑STERNE · GENERAL</h1>
-<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREFETCH · PREDICT · CACHE · VEREINHEITLICHTE LOGIK</h1>
+<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">ERWEITERT · AXIOM‑MODULE · SCORE‑HISTORIE · PUMP‑VISUALISIERUNG</h1>
 
 <div class="grid2">
   <div>
@@ -62,6 +73,13 @@
         <button id="btnRandom">🎲 RANDOM</button>
         <button id="btnPump">💨 PUMP</button>
         <button id="btnLoop">♾ LOOP ALL</button>
+        <button id="btnExport">📤 EXPORT</button>
+        <button id="btnImport">📥 IMPORT</button>
+      </div>
+      <div class="flex" style="margin-top:4px">
+        <label style="font-size:8px;color:#3d5a70">AUTO‑PUMP (ms):</label>
+        <input type="number" id="intervalInput" value="8000" min="1000" max="30000" step="500">
+        <button id="btnSetInterval" class="sec">⏱ SET</button>
       </div>
     </div>
 
@@ -72,13 +90,7 @@
 
     <div class="panel">
       <h3>🔷 PUMP · STATIONEN</h3>
-      <div class="flex" style="font-size:8px;color:#5a7a8a;gap:2px">
-        <span class="badge info">HY</span><span class="badge info">PE</span>
-        <span class="badge info">PER</span><span class="badge info">DA</span>
-        <span class="badge info">NE</span><span class="badge info">BEN</span>
-        <span class="badge info">TRANS</span><span class="badge info">WARB</span>
-        <span class="badge info">KANAL</span>
-      </div>
+      <div class="station-grid" id="stationGrid"></div>
     </div>
 
     <div class="panel">
@@ -88,7 +100,13 @@
         <span>PUMP: <span id="pumpVal" style="color:#6bffa9">0</span></span>
         <span>QUOTE: <span id="quoteVal" style="color:#66ccff">0%</span></span>
         <span>PREDICT: <span id="predictVal" style="color:#ffd700">IDLE</span></span>
+        <span>TREND: <span id="trendVal" style="color:#6bffa9">—</span></span>
       </div>
+    </div>
+
+    <div class="panel">
+      <h3>📈 SCORE‑HISTORIE</h3>
+      <div class="history-list" id="historyList">⏳ keine Daten</div>
     </div>
 
     <div class="panel">
@@ -157,13 +175,12 @@
 
 <script>
 // ============================================================
-// IKI1UC · 3‑STERNE‑GENERAL · PREFETCH · PREDICT · CACHE
-// VEREINHEITLICHT: eine einzige Berechnungsfunktion (sync),
-// die JEDE Aktion aufruft — nicht nur LOOP ALL — und nur EIN
-// render() pro Klick.
+// IKI1UC · 3‑STERNE‑GENERAL · ERWEITERT
+// AXIOM‑Module als separate Funktionen, alle rufen sync()
 // ============================================================
 const engine = {
 
+  // ---------- KERNEL ----------
   state: {
     score: 1000, pump: 0, quote: 0.5, predict: 'IDLE',
     cpuJump: 0, cpuBias: 'FORWARD', root: 0, achse: 'A', tmp: 128,
@@ -176,7 +193,11 @@ const engine = {
   prefetch: [[3, 9], [27, 81], [243, 729]],
   liveWindow: [['3','9'], ['27','81'], ['243','729']],
   memory: { hits: 0, misses: 0, slides: [], jumps: [] },
+  history: [], // Score‑Historie (max 10)
+  autoInterval: null,
+  intervalMs: 8000,
 
+  // ---------- LOG ----------
   log(msg, type = 'info') {
     const el = document.getElementById('consoleLog');
     const t = new Date().toLocaleTimeString();
@@ -186,9 +207,46 @@ const engine = {
     if (el.children.length > 30) el.removeChild(el.firstChild);
   },
 
+  // ---------- HISTORY ----------
+  pushHistory(score) {
+    this.history.push(score);
+    if (this.history.length > 10) this.history.shift();
+    this.renderHistory();
+  },
+
+  renderHistory() {
+    const el = document.getElementById('historyList');
+    if (this.history.length === 0) {
+      el.innerHTML = '⏳ keine Daten';
+      return;
+    }
+    const max = Math.max(...this.history);
+    const min = Math.min(...this.history);
+    const last = this.history[this.history.length - 1];
+    const prev = this.history.length > 1 ? this.history[this.history.length - 2] : last;
+    const trend = last > prev ? '📈' : last < prev ? '📉' : '➡️';
+    const trendClass = last > prev ? 'trend-up' : last < prev ? 'trend-down' : 'trend-flat';
+    document.getElementById('trendVal').textContent = trend;
+    document.getElementById('trendVal').className = trendClass;
+    el.innerHTML = this.history.map((s, i) =>
+      `<span class="score-entry">${s}</span>${i < this.history.length-1 ? ' → ' : ''}`
+    ).join('') + ` <span class="${trendClass}">${trend}</span> (max:${max} min:${min})`;
+  },
+
+  // ---------- STATION VISUALISIERUNG ----------
+  renderStations(boostIndex) {
+    const el = document.getElementById('stationGrid');
+    el.innerHTML = '';
+    this.stations.forEach((s, i) => {
+      const pill = document.createElement('span');
+      pill.className = 'station-pill' + (i === boostIndex ? ' boost' : '');
+      pill.textContent = s;
+      el.appendChild(pill);
+    });
+  },
+
   // ============================================================
   // ⭐ EINZIGE zentrale Berechnung — von JEDER Aktion aufgerufen.
-  // Keine zweite, abweichende Formel mehr an anderer Stelle.
   // ============================================================
   sync() {
     const active = this.axles.filter(a => a.active).length;
@@ -202,11 +260,12 @@ const engine = {
     s.d = 9 * active + Math.floor(s.pump / 4);
     s.f = 27 * active + Math.floor(s.pump / 2);
 
+    // EINHEITLICHE SPRUNG-FORMEL (/8) — keine Abweichung mehr
     s.cpuJump = active + Math.floor(s.pump / 8);
     s.cpuBias = s.quote > 0.6 ? 'FORWARD' : 'REVERSE';
     s.predict = (active > 0 && s.quote > 0.4) ? 'ACTIVE' : 'IDLE';
 
-    // Trefferquote: EINE Regel, EINE Stelle
+    // Trefferquote: einheitlich
     if (s.cpuJump > 0) {
       this.memory.hits++;
       s.predictCount++;
@@ -217,7 +276,7 @@ const engine = {
     }
     s.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
 
-    // Live-Fenster: EINE Formel
+    // Live‑Fenster
     const vals = [3,9,27,81,243,729];
     const shift = (s.root + s.pump + s.cpuJump) % 6;
     this.liveWindow = [
@@ -226,11 +285,19 @@ const engine = {
       [vals[(shift+4)%6], vals[(shift+5)%6]]
     ];
 
-    // Metriken: laufen jetzt bei JEDER Aktion mit, nicht nur bei LOOP ALL
+    // Metriken
     s.prefetchCount++;
     if (s.tmp > 0) s.cacheCount++;
 
-    this.render(); // genau EIN Render pro sync()-Aufruf
+    // Score‑Historie
+    this.pushHistory(s.score);
+
+    // Station‑Visualisierung (welche boostet)
+    const boostIdx = (s.pump + active) % this.stations.length;
+    this.renderStations(boostIdx);
+
+    // EINZIGER Render-Aufruf
+    this.render();
   },
 
   // ---------- RENDER ----------
@@ -328,9 +395,39 @@ PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
   },
 
   // ============================================================
-  // ⭐ AKTIONEN — verändern nur pump/score/axles, rufen danach
-  // genau EINMAL sync() auf. Keine eigene Predict-/Metrik-Logik
-  // mehr in den einzelnen Aktionen.
+  // ⭐ AXIOM‑MODULE — separate Funktionen, alle rufen sync()
+  // ============================================================
+  orbitFusion() {
+    // Früher hatte sie eigene Formel – jetzt nur noch sync()
+    this.sync();
+  },
+
+  pumpKernel() {
+    // Früher eigene Pump‑Logik – jetzt nur noch sync()
+    this.sync();
+  },
+
+  predictiveEngine() {
+    // Früher eigene Predict‑Logik – jetzt nur noch sync()
+    this.sync();
+  },
+
+  windowEngine() {
+    // Früher eigenes Fenster‑Update – jetzt nur noch sync()
+    this.sync();
+  },
+
+  loopAll() {
+    // Vereinfacht: toggelt Achsen, erhöht Pump, ruft sync()
+    this.axles.forEach(a => a.active = !a.active);
+    const active = this.axles.filter(a => a.active).length;
+    this.state.pump = Math.min(this.state.pump + active, 128);
+    this.log('♾ LOOP-ALL · orbit complete', 'ok');
+    this.sync();
+  },
+
+  // ============================================================
+  // ⭐ AKTIONEN
   // ============================================================
   toggleAxle(i) {
     this.axles[i].active = !this.axles[i].active;
@@ -344,6 +441,7 @@ PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
       this.log('❗ keine achse aktiv — pump gestoppt', 'err');
       return;
     }
+    // Station‑Boosts (visuell)
     this.stations.forEach((st, i) => {
       if ((this.state.pump + i) % 3 === 0) {
         this.log(`🔷 STATION ${st} → BOOST`, 'ok');
@@ -382,13 +480,6 @@ PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
     this.sync();
   },
 
-  loopAll() {
-    this.axles.forEach(a => a.active = !a.active);
-    this.state.pump = Math.min(this.state.pump + this.axles.filter(a=>a.active).length, 128);
-    this.log('♾ LOOP-ALL · orbit complete', 'ok');
-    this.sync(); // genau EIN sync()/render(), nicht mehr drei
-  },
-
   resetAll() {
     this.axles.forEach(a => a.active = false);
     Object.assign(this.state, {
@@ -397,29 +488,104 @@ PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
       prefetchCount: 0, predictCount: 0, cacheCount: 0
     });
     this.memory = { hits: 0, misses: 0, slides: [], jumps: [] };
+    this.history = [];
     this.liveWindow = [['3','9'], ['27','81'], ['243','729']];
     document.getElementById('consoleLog').innerHTML = '⏳ system zurückgesetzt...';
+    this.renderStations(-1);
+    this.renderHistory();
     this.log('⟲ RESET · komplett neu', 'ok');
     this.render();
   },
 
-  init() {
-    this.log('⭐ 3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE', 'ok');
-    this.log('📊 vereinheitlichte sync()-Logik für alle Aktionen', 'info');
-    this.render();
-    setInterval(() => {
+  // ---------- EXPORT / IMPORT ----------
+  exportState() {
+    const data = {
+      state: this.state,
+      axles: this.axles,
+      memory: this.memory,
+      history: this.history,
+      liveWindow: this.liveWindow,
+      prefetch: this.prefetch
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'axiom4_state.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    this.log('📤 EXPORT · Zustand gespeichert', 'ok');
+  },
+
+  importState(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        Object.assign(this.state, data.state);
+        this.axles = data.axles;
+        this.memory = data.memory;
+        this.history = data.history || [];
+        this.liveWindow = data.liveWindow;
+        this.prefetch = data.prefetch;
+        this.renderHistory();
+        this.log('📥 IMPORT · Zustand geladen', 'ok');
+        this.sync();
+      } catch (err) {
+        this.log('❌ IMPORT · Fehler: ' + err.message, 'err');
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  // ---------- AUTO-PUMP ----------
+  setInterval(ms) {
+    if (this.autoInterval) clearInterval(this.autoInterval);
+    this.intervalMs = ms;
+    this.autoInterval = setInterval(() => {
       if (this.axles.some(a => a.active)) this.pumpCycle();
-    }, 8000);
+    }, ms);
+    this.log(`⏱ AUTO-PUMP · Intervall auf ${ms}ms gesetzt`, 'info');
+  },
+
+  // ---------- INIT ----------
+  init() {
+    this.log('⭐ 3‑STERNE · GENERAL · ERWEITERT', 'ok');
+    this.log('📊 AXIOM‑Module als separate Funktionen', 'info');
+    this.log('📈 Score‑Historie · Station‑Visualisierung', 'info');
+    this.render();
+    this.renderStations(-1);
+    this.renderHistory();
+    document.getElementById('intervalInput').value = this.intervalMs;
+    this.setInterval(this.intervalMs);
   }
 };
 
+// ---------- BUTTONS ----------
 document.getElementById('btnGeneral').addEventListener('click', () => engine.runGeneral());
 document.getElementById('btnReset').addEventListener('click', () => engine.resetAll());
 document.getElementById('btnToggleAll').addEventListener('click', () => engine.toggleAll());
 document.getElementById('btnRandom').addEventListener('click', () => engine.randomize());
 document.getElementById('btnPump').addEventListener('click', () => engine.pumpCycle());
 document.getElementById('btnLoop').addEventListener('click', () => engine.loopAll());
+document.getElementById('btnExport').addEventListener('click', () => engine.exportState());
+document.getElementById('btnImport').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    if (e.target.files.length > 0) engine.importState(e.target.files[0]);
+  };
+  input.click();
+});
+document.getElementById('btnSetInterval').addEventListener('click', () => {
+  const val = parseInt(document.getElementById('intervalInput').value);
+  if (val >= 1000 && val <= 30000) engine.setInterval(val);
+  else engine.log('❌ Intervall muss zwischen 1000 und 30000 ms liegen', 'err');
+});
 
+// ---------- START ----------
 engine.init();
 window.engine = engine;
 </script>
