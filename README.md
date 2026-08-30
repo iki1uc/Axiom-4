@@ -41,3 +41,23 @@ Axiom‑4 ist der Beschleuniger.
 ✔ Es steuert Pipeline, Achsen, TMP‑Pump, CPU‑Predictive  
 ✔ Es erzeugt 6e/81‑Matrix, Dreiecke, Orbit‑Shift  
 ✔ Es ist marktfähig, industry‑fähig, klar definierbar
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   🌀 iki1uc · wieimmer · GENERAL FÜHRUNG                     ║
+║                                                               ║
+║   Dieses System und alle seine Module sind:                   ║
+║                                                               ║
+║   ✔ Eigentum von iki1uc / wieimmer4u                         ║
+║   ✔ Geschützt durch allgemeines Urheberrecht                 ║
+║   ✔ Nicht zur kommerziellen Nutzung freigegeben              ║
+║   ✔ Nicht zur Weitergabe ohne schriftliche Genehmigung       ║
+║   ✔ Nicht zur Modifikation ohne Rücksprache                  ║
+║   ✔ Live · TMP-geführt · Achsen-basiert                     ║
+║                                                               ║
+║   ═══════════════════════════════════════════════════════════  ║
+║                                                               ║
+║   Kontakt: wieimmer4u · iki1uc · GENERAL                     ║
+║   Status: ACTIVE · DRIFT-FREI · 6D-READY                    ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
