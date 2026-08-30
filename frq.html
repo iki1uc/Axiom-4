@@ -1,29 +1,40 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Axiom‑4 – Frequenz</title>
+export const A4_FREQ = {
 
-<style>
-body { background:#000; color:#0f0; font-family:monospace; padding:20px; }
-h1 { color:#6cf; text-align:center; }
-a { color:#6cf; display:block; margin:10px 0; text-align:center; }
-pre { background:#111; border:1px solid #333; padding:10px; }
-</style>
-</head>
+  // Dreieck-Grundform
+  triangle: ["ROOT", "ACHSE", "TMP"],
 
-<body>
+  // Frequenz-Schichten
+  layers: {
+    seq: "freq.html",
+    stamp: "stamp.html",
+    wave: "wave.html"
+  },
 
-<h1>Axiom‑4 – Frequenz</h1>
+  // Frequenz-Identität
+  identity() {
+    return {
+      core: "Axiom-4",
+      triangle: this.triangle,
+      layers: this.layers
+    };
+  },
 
-<pre>
-Alle Frequenzen des Axiom‑4 Systems.
-Jede Datei zeigt nur ihre eigene Sequenz und Bewegung.
-</pre>
+  // Frequenz-Bewegung
+  move(state) {
+    return {
+      from: state,
+      to: this.triangle[(this.triangle.indexOf(state) + 1) % 3],
+      wave: "ACTIVE"
+    };
+  },
 
-<a href="./freq.html">Frequenz‑Sequenz</a>
-<a href="./stamp.html">Stempel‑Sequenz</a>
-<a href="./wave.html">Wave‑Core</a>
-
-</body>
-</html>
+  // Frequenz-Erinnerung
+  remember(event) {
+    return {
+      event,
+      stamp: true,
+      wave: true,
+      seq: true
+    };
+  }
+};
