@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IKI1UC · Axiom‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG · FINAL</title>
+    <title>3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a12;color:#d0d9e6;font-family:'Consolas',monospace;padding:10px;min-height:100vh}
@@ -23,6 +23,8 @@
         pre{background:rgba(0,0,0,0.4);padding:8px;border-radius:6px;border:1px solid rgba(0,200,255,0.05);font-size:9px;line-height:1.3;white-space:pre-wrap;color:#8ab4c8;margin:4px 0;max-height:120px;overflow:auto}
         .badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;margin:0 2px}
         .badge.info{background:#0a1a2a;color:#66ccff}
+        .badge.gold{background:#2a1a0a;color:#ffd700}
+        .badge.green{background:#0a2a1a;color:#6bffa9}
         .status-row{display:flex;flex-wrap:wrap;gap:6px;font-size:9px;margin:3px 0;color:#5a7a8a}
         .status-row span{background:rgba(255,255,255,0.02);padding:2px 6px;border-radius:3px}
         .console{background:#0a0a0a;padding:6px;border-radius:4px;font-size:7px;color:#3d5a70;max-height:80px;overflow-y:auto;border:1px solid #111}
@@ -38,12 +40,18 @@
         .axle-cell{background:#0a0a0a;padding:3px;text-align:center;font-size:7px;border:1px solid #111;border-radius:2px;color:#3d5a70;cursor:pointer}
         .axle-cell.on{background:#0a2a1a;color:#6bffa9;border-color:#0f0}
         .axle-cell.off{background:#0a0a0a;color:#3d5a70}
+        .metric-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin:4px 0}
+        .metric{background:#0a0a0a;padding:6px;border-radius:4px;text-align:center;border:1px solid #1a1a2a}
+        .metric .label{font-size:7px;color:#3d5a70;text-transform:uppercase}
+        .metric .value{font-size:16px;font-weight:bold;color:#6bffa9}
+        .metric .value.gold{color:#ffd700}
+        .metric .value.info{color:#66ccff}
     </style>
 </head>
 <body>
 
-<h1>⚡ IKI1UC · AXIOM‑4 · INDUSTRY PUMP</h1>
-<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREDICTIVE SPRUNG · 3×2 PREFETCH · FINAL · ALLE MODULE AKTIV</h1>
+<h1>⭐ 3‑STERNE · GENERAL</h1>
+<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREFETCH · PREDICT · CACHE · 3 ANZEIGEN</h1>
 
 <div class="grid2">
   <div>
@@ -92,6 +100,25 @@
   </div>
 
   <div>
+    <!-- 3 METRIKEN: PREFETCH · PREDICT · CACHE -->
+    <div class="panel">
+      <h3>📊 3 ANZEIGEN · PREFETCH · PREDICT · CACHE</h3>
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="label">📦 PREFETCH</div>
+          <div class="value" id="prefetchCount">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">🧠 PREDICT</div>
+          <div class="value gold" id="predictCount">0</div>
+        </div>
+        <div class="metric">
+          <div class="label">💾 CACHE</div>
+          <div class="value info" id="cacheCount">0</div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <h3>📊 3×2 PREFETCH · IKI1UC</h3>
       <div class="matrix-3x2" id="prefetchGrid"></div>
@@ -133,8 +160,7 @@
 
 <script>
 // ============================================================
-// IKI1UC · AXIOM‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG
-// FINAL · ALLE MODULE IMPLEMENTIERT
+// IKI1UC · 3‑STERNE‑GENERAL · PREFETCH · PREDICT · CACHE
 // ============================================================
 const engine = {
 
@@ -151,7 +177,10 @@ const engine = {
     tmp: 128,
     q: 27,
     d: 81,
-    f: 243
+    f: 243,
+    prefetchCount: 0,
+    predictCount: 0,
+    cacheCount: 0
   },
 
   axles: 'deinorsuw'.split('').map(ch => ({ name: ch, active: false })),
@@ -170,11 +199,17 @@ const engine = {
     if (el.children.length > 30) el.removeChild(el.firstChild);
   },
 
+  // ---------- 3 ANZEIGEN UPDATE ----------
+  updateMetrics() {
+    document.getElementById('prefetchCount').textContent = this.state.prefetchCount;
+    document.getElementById('predictCount').textContent = this.state.predictCount;
+    document.getElementById('cacheCount').textContent = this.state.cacheCount;
+  },
+
   // ============================================================
-  // ⭐ AXIOM 1 — ORBIT-MODULE (voll implementiert)
+  // ⭐ ORBIT‑MODULE
   // ============================================================
 
-  // ─── ORBIT‑FUSION ───
   orbitFusion() {
     const active = this.axles.filter(a => a.active).length;
     this.state.root = active;
@@ -187,7 +222,9 @@ const engine = {
 
     this.state.cpuJump = active + Math.floor(this.state.pump / 8);
     this.state.cpuBias = this.state.quote > 0.6 ? 'FORWARD' : 'REVERSE';
-    this.state.predict = active > 0 ? 'ACTIVE' : 'IDLE';
+
+    // ⭐ EINHEITLICHE PREDICT‑REGEL: active > 0 && quote > 0.4
+    this.state.predict = (active > 0 && this.state.quote > 0.4) ? 'ACTIVE' : 'IDLE';
 
     const vals = [3,9,27,81,243,729];
     const shift = (active + this.state.pump) % 6;
@@ -197,11 +234,15 @@ const engine = {
       [vals[(shift+4)%6], vals[(shift+5)%6]]
     ];
 
-    this.log(`🌀 ORBIT-FUSION · active=${active} · pump=${this.state.pump}`, 'info');
+    // Cache zählt bei jedem Orbit‑Sync (TMP‑Nutzung)
+    if (this.state.tmp > 0) {
+      this.state.cacheCount++;
+    }
+
+    this.updateMetrics();
     this.render();
   },
 
-  // ─── PUMP‑KERNEL ───
   pumpKernel() {
     const active = this.axles.filter(a => a.active).length;
     if (active === 0) return;
@@ -218,7 +259,7 @@ const engine = {
     this.orbitFusion();
   },
 
-  // ─── PREDICTIVE‑ENGINE ───
+  // ⭐ PREDICTIVE‑ENGINE mit einheitlicher Trefferquote (cpuJump > 0)
   predictiveEngine() {
     const active = this.axles.filter(a => a.active).length;
     if (active === 0) {
@@ -233,18 +274,24 @@ const engine = {
 
     this.state.cpuBias = bias;
     this.state.cpuJump = jump;
-    this.state.predict = 'ACTIVE';
 
-    this.memory.hits += 1;
-    this.memory.slides.push(active);
-    this.memory.jumps.push(jump);
+    // ⭐ EINHEITLICHE TREFFERQUOTE: nur wenn cpuJump > 0
+    if (jump > 0) {
+      this.memory.hits++;
+      this.state.predictCount++;  // Predict‑Zähler
+      this.memory.slides.push(active);
+      this.memory.jumps.push(jump);
+    } else {
+      this.memory.misses++;
+    }
+
     this.state.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
+    this.state.predict = (active > 0 && this.state.quote > 0.4) ? 'ACTIVE' : 'IDLE';
 
     this.log(`🧠 SPRUNG · ${bias} · jump=${jump} · quote=${Math.round(this.state.quote*100)}%`, 'warn');
     this.orbitFusion();
   },
 
-  // ─── WINDOW‑ENGINE ───
   windowEngine() {
     const vals = [3,9,27,81,243,729];
     const shift = (this.state.root + this.state.pump + this.state.cpuJump) % 6;
@@ -253,21 +300,24 @@ const engine = {
       [vals[(shift+2)%6], vals[(shift+3)%6]],
       [vals[(shift+4)%6], vals[(shift+5)%6]]
     ];
+    // Prefetch zählt bei jedem Fenster‑Update
+    this.state.prefetchCount++;
+    this.updateMetrics();
     this.renderLiveWindow();
   },
 
-  // ─── LOOP‑ALL ───
+  // ⭐ LOOP‑ALL mit nur EINEM Render
   loopAll() {
     this.axles.forEach(a => a.active = !a.active);
-    this.pumpKernel();
-    this.predictiveEngine();
-    this.windowEngine();
-    this.render();
-    this.log('♾ LOOP-ALL · orbit complete', 'ok');
+    this.pumpKernel();      // → intern orbitFusion() → render()
+    this.predictiveEngine(); // → intern orbitFusion() → render()
+    this.windowEngine();     // → renderLiveWindow() (kein full render)
+    // KEIN zusätzlicher render() Aufruf mehr!
+    this.log('♾ LOOP-ALL · orbit complete (einmal gerendert)', 'ok');
   },
 
   // ============================================================
-  // ⭐ AXIOM 2 — RENDER-MODULE
+  // ⭐ RENDER‑MODULE
   // ============================================================
   render() {
     this.renderAxles();
@@ -352,11 +402,12 @@ Bias          : ${this.state.cpuBias}
 ROOT          : ${this.state.root}
 ACHSE         : ${this.state.achse}
 TMP           : ${this.state.tmp}
-Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}`;
+Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}
+PREFETCH:${this.state.prefetchCount}  PREDICT:${this.state.predictCount}  CACHE:${this.state.cacheCount}`;
   },
 
   // ============================================================
-  // ⭐ AXIOM 3 — ACTION-MODULE
+  // ⭐ ACTION‑MODULE
   // ============================================================
   toggleAxle(i) {
     this.axles[i].active = !this.axles[i].active;
@@ -407,9 +458,10 @@ Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}`;
       this.state.root = active;
       this.state.tmp = 128 - this.state.pump;
 
-      const hit = this.state.cpuJump > 0;
-      if (hit) {
+      // ⭐ EINHEITLICHE TREFFERQUOTE: nur wenn cpuJump > 0
+      if (this.state.cpuJump > 0) {
         this.memory.hits++;
+        this.state.predictCount++;  // Predict‑Zähler
         this.memory.slides.push(active);
         this.memory.jumps.push(this.state.cpuJump);
       } else {
@@ -458,22 +510,25 @@ Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}`;
     this.axles.forEach(a => a.active = false);
     Object.assign(this.state, {
       score: 1000, pump: 0, quote: 0.5, predict: 'IDLE', cpuJump: 0,
-      cpuBias: 'FORWARD', root: 0, achse: '0', tmp: 128, q: 27, d: 81, f: 243
+      cpuBias: 'FORWARD', root: 0, achse: '0', tmp: 128, q: 27, d: 81, f: 243,
+      prefetchCount: 0, predictCount: 0, cacheCount: 0
     });
     this.memory = { hits: 0, misses: 0, slides: [], jumps: [] };
     this.liveWindow = [['3','9'], ['27','81'], ['243','729']];
     document.getElementById('consoleLog').innerHTML = '⏳ system zurückgesetzt...';
+    this.updateMetrics();
     this.log('⟲ RESET · komplett neu', 'ok');
     this.render();
   },
 
   // ---------- INIT ----------
   init() {
-    this.log('🚀 AXIOM‑4 · INDUSTRY PUMP · PREDICTIVE SPRUNG · FINAL', 'ok');
+    this.log('⭐ 3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE', 'ok');
     this.log('📊 9 ACHSEN · 3×2 PREFETCH · MYSTERY Q/D/F', 'info');
     this.log('💨 PUMP · CPU‑PREDICT · TREFFERQUOTE', 'info');
     this.log('🌀 ORBIT‑FUSION · PUMP‑KERNEL · WINDOW‑ENGINE · LOOP‑ALL', 'ok');
     this.render();
+    this.updateMetrics();
     setTimeout(() => this.triggerPredict(), 500);
     setInterval(() => {
       if (this.axles.some(a => a.active)) this.pumpCycle();
