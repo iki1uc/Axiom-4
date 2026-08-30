@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE</title>
+    <title>3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE · VEREINHEITLICHT</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#0a0a12;color:#d0d9e6;font-family:'Consolas',monospace;padding:10px;min-height:100vh}
@@ -23,8 +23,6 @@
         pre{background:rgba(0,0,0,0.4);padding:8px;border-radius:6px;border:1px solid rgba(0,200,255,0.05);font-size:9px;line-height:1.3;white-space:pre-wrap;color:#8ab4c8;margin:4px 0;max-height:120px;overflow:auto}
         .badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:8px;margin:0 2px}
         .badge.info{background:#0a1a2a;color:#66ccff}
-        .badge.gold{background:#2a1a0a;color:#ffd700}
-        .badge.green{background:#0a2a1a;color:#6bffa9}
         .status-row{display:flex;flex-wrap:wrap;gap:6px;font-size:9px;margin:3px 0;color:#5a7a8a}
         .status-row span{background:rgba(255,255,255,0.02);padding:2px 6px;border-radius:3px}
         .console{background:#0a0a0a;padding:6px;border-radius:4px;font-size:7px;color:#3d5a70;max-height:80px;overflow-y:auto;border:1px solid #111}
@@ -51,7 +49,7 @@
 <body>
 
 <h1>⭐ 3‑STERNE · GENERAL</h1>
-<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREFETCH · PREDICT · CACHE · 3 ANZEIGEN</h1>
+<h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">PREFETCH · PREDICT · CACHE · VEREINHEITLICHTE LOGIK</h1>
 
 <div class="grid2">
   <div>
@@ -100,7 +98,6 @@
   </div>
 
   <div>
-    <!-- 3 METRIKEN: PREFETCH · PREDICT · CACHE -->
     <div class="panel">
       <h3>📊 3 ANZEIGEN · PREFETCH · PREDICT · CACHE</h3>
       <div class="metric-grid">
@@ -161,26 +158,17 @@
 <script>
 // ============================================================
 // IKI1UC · 3‑STERNE‑GENERAL · PREFETCH · PREDICT · CACHE
+// VEREINHEITLICHT: eine einzige Berechnungsfunktion (sync),
+// die JEDE Aktion aufruft — nicht nur LOOP ALL — und nur EIN
+// render() pro Klick.
 // ============================================================
 const engine = {
 
-  // ---------- KERNEL ----------
   state: {
-    score: 1000,
-    pump: 0,
-    quote: 0.5,
-    predict: 'IDLE',
-    cpuJump: 0,
-    cpuBias: 'FORWARD',
-    root: 0,
-    achse: 'A',
-    tmp: 128,
-    q: 27,
-    d: 81,
-    f: 243,
-    prefetchCount: 0,
-    predictCount: 0,
-    cacheCount: 0
+    score: 1000, pump: 0, quote: 0.5, predict: 'IDLE',
+    cpuJump: 0, cpuBias: 'FORWARD', root: 0, achse: 'A', tmp: 128,
+    q: 27, d: 81, f: 243,
+    prefetchCount: 0, predictCount: 0, cacheCount: 0
   },
 
   axles: 'deinorsuw'.split('').map(ch => ({ name: ch, active: false })),
@@ -189,7 +177,6 @@ const engine = {
   liveWindow: [['3','9'], ['27','81'], ['243','729']],
   memory: { hits: 0, misses: 0, slides: [], jumps: [] },
 
-  // ---------- LOG ----------
   log(msg, type = 'info') {
     const el = document.getElementById('consoleLog');
     const t = new Date().toLocaleTimeString();
@@ -199,126 +186,54 @@ const engine = {
     if (el.children.length > 30) el.removeChild(el.firstChild);
   },
 
-  // ---------- 3 ANZEIGEN UPDATE ----------
-  updateMetrics() {
-    document.getElementById('prefetchCount').textContent = this.state.prefetchCount;
-    document.getElementById('predictCount').textContent = this.state.predictCount;
-    document.getElementById('cacheCount').textContent = this.state.cacheCount;
-  },
-
   // ============================================================
-  // ⭐ ORBIT‑MODULE
+  // ⭐ EINZIGE zentrale Berechnung — von JEDER Aktion aufgerufen.
+  // Keine zweite, abweichende Formel mehr an anderer Stelle.
   // ============================================================
-
-  orbitFusion() {
+  sync() {
     const active = this.axles.filter(a => a.active).length;
-    this.state.root = active;
-    this.state.achse = active > 0 ? String.fromCharCode(64 + active) : '0';
-    this.state.tmp = 128 - this.state.pump;
+    const s = this.state;
 
-    this.state.q = 3 * active + (this.state.pump % 7);
-    this.state.d = 9 * active + Math.floor(this.state.pump / 4);
-    this.state.f = 27 * active + Math.floor(this.state.pump / 2);
+    s.root = active;
+    s.achse = active > 0 ? String.fromCharCode(64 + active) : '0';
+    s.tmp = 128 - s.pump;
 
-    this.state.cpuJump = active + Math.floor(this.state.pump / 8);
-    this.state.cpuBias = this.state.quote > 0.6 ? 'FORWARD' : 'REVERSE';
+    s.q = 3 * active + (s.pump % 7);
+    s.d = 9 * active + Math.floor(s.pump / 4);
+    s.f = 27 * active + Math.floor(s.pump / 2);
 
-    // ⭐ EINHEITLICHE PREDICT‑REGEL: active > 0 && quote > 0.4
-    this.state.predict = (active > 0 && this.state.quote > 0.4) ? 'ACTIVE' : 'IDLE';
+    s.cpuJump = active + Math.floor(s.pump / 8);
+    s.cpuBias = s.quote > 0.6 ? 'FORWARD' : 'REVERSE';
+    s.predict = (active > 0 && s.quote > 0.4) ? 'ACTIVE' : 'IDLE';
 
-    const vals = [3,9,27,81,243,729];
-    const shift = (active + this.state.pump) % 6;
-    this.liveWindow = [
-      [vals[(shift)%6], vals[(shift+1)%6]],
-      [vals[(shift+2)%6], vals[(shift+3)%6]],
-      [vals[(shift+4)%6], vals[(shift+5)%6]]
-    ];
-
-    // Cache zählt bei jedem Orbit‑Sync (TMP‑Nutzung)
-    if (this.state.tmp > 0) {
-      this.state.cacheCount++;
-    }
-
-    this.updateMetrics();
-    this.render();
-  },
-
-  pumpKernel() {
-    const active = this.axles.filter(a => a.active).length;
-    if (active === 0) return;
-
-    this.stations.forEach((s, i) => {
-      if ((this.state.pump + i) % 3 === 0) {
-        this.log(`🔷 STATION ${s} → BOOST`, 'ok');
-        this.state.score += (active * (i + 1));
-      }
-    });
-
-    this.state.pump += active;
-    this.state.quote = Math.min(1, this.state.quote + active * 0.005);
-    this.orbitFusion();
-  },
-
-  // ⭐ PREDICTIVE‑ENGINE mit einheitlicher Trefferquote (cpuJump > 0)
-  predictiveEngine() {
-    const active = this.axles.filter(a => a.active).length;
-    if (active === 0) {
-      this.state.predict = 'IDLE';
-      this.state.cpuJump = 0;
-      this.log('⏸ PREDICTIVE · idle', 'info');
-      return;
-    }
-
-    const bias = this.state.quote > 0.6 ? 'FORWARD' : 'REVERSE';
-    const jump = active + Math.floor(this.state.pump / 6);
-
-    this.state.cpuBias = bias;
-    this.state.cpuJump = jump;
-
-    // ⭐ EINHEITLICHE TREFFERQUOTE: nur wenn cpuJump > 0
-    if (jump > 0) {
+    // Trefferquote: EINE Regel, EINE Stelle
+    if (s.cpuJump > 0) {
       this.memory.hits++;
-      this.state.predictCount++;  // Predict‑Zähler
+      s.predictCount++;
       this.memory.slides.push(active);
-      this.memory.jumps.push(jump);
+      this.memory.jumps.push(s.cpuJump);
     } else {
       this.memory.misses++;
     }
+    s.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
 
-    this.state.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
-    this.state.predict = (active > 0 && this.state.quote > 0.4) ? 'ACTIVE' : 'IDLE';
-
-    this.log(`🧠 SPRUNG · ${bias} · jump=${jump} · quote=${Math.round(this.state.quote*100)}%`, 'warn');
-    this.orbitFusion();
-  },
-
-  windowEngine() {
+    // Live-Fenster: EINE Formel
     const vals = [3,9,27,81,243,729];
-    const shift = (this.state.root + this.state.pump + this.state.cpuJump) % 6;
+    const shift = (s.root + s.pump + s.cpuJump) % 6;
     this.liveWindow = [
       [vals[(shift)%6], vals[(shift+1)%6]],
       [vals[(shift+2)%6], vals[(shift+3)%6]],
       [vals[(shift+4)%6], vals[(shift+5)%6]]
     ];
-    // Prefetch zählt bei jedem Fenster‑Update
-    this.state.prefetchCount++;
-    this.updateMetrics();
-    this.renderLiveWindow();
+
+    // Metriken: laufen jetzt bei JEDER Aktion mit, nicht nur bei LOOP ALL
+    s.prefetchCount++;
+    if (s.tmp > 0) s.cacheCount++;
+
+    this.render(); // genau EIN Render pro sync()-Aufruf
   },
 
-  // ⭐ LOOP‑ALL mit nur EINEM Render
-  loopAll() {
-    this.axles.forEach(a => a.active = !a.active);
-    this.pumpKernel();      // → intern orbitFusion() → render()
-    this.predictiveEngine(); // → intern orbitFusion() → render()
-    this.windowEngine();     // → renderLiveWindow() (kein full render)
-    // KEIN zusätzlicher render() Aufruf mehr!
-    this.log('♾ LOOP-ALL · orbit complete (einmal gerendert)', 'ok');
-  },
-
-  // ============================================================
-  // ⭐ RENDER‑MODULE
-  // ============================================================
+  // ---------- RENDER ----------
   render() {
     this.renderAxles();
     this.renderPrefetch();
@@ -326,6 +241,7 @@ const engine = {
     this.updateStatus();
     this.updateMystery();
     this.updateCPU();
+    this.updateMetrics();
     this.renderResult();
   },
 
@@ -385,38 +301,41 @@ const engine = {
     document.getElementById('cpuJump').textContent = this.state.cpuJump;
   },
 
+  updateMetrics() {
+    document.getElementById('prefetchCount').textContent = this.state.prefetchCount;
+    document.getElementById('predictCount').textContent = this.state.predictCount;
+    document.getElementById('cacheCount').textContent = this.state.cacheCount;
+  },
+
   renderResult() {
     const el = document.getElementById('resultDisplay');
     const active = this.axles.filter(a => a.active).length;
-    const p = this.state.pump;
-    const q = Math.round(this.state.quote * 100);
+    const s = this.state;
     el.textContent =
-`MASSSNAHME · IKI1UC
+`MASSNAHME · IKI1UC
 ─────────────────
 aktive Achsen : ${active} / 9
-Pump-Stack    : ${p} / 128
-Trefferquote  : ${q}%
-Predict       : ${this.state.predict}
-Sprung        : ${this.state.cpuJump}
-Bias          : ${this.state.cpuBias}
-ROOT          : ${this.state.root}
-ACHSE         : ${this.state.achse}
-TMP           : ${this.state.tmp}
-Q:${this.state.q}  D:${this.state.d}  F:${this.state.f}
-PREFETCH:${this.state.prefetchCount}  PREDICT:${this.state.predictCount}  CACHE:${this.state.cacheCount}`;
+Pump-Stack    : ${s.pump} / 128
+Trefferquote  : ${Math.round(s.quote*100)}%
+Predict       : ${s.predict}
+Sprung        : ${s.cpuJump}
+Bias          : ${s.cpuBias}
+ROOT          : ${s.root}
+ACHSE         : ${s.achse}
+TMP           : ${s.tmp}
+Q:${s.q}  D:${s.d}  F:${s.f}
+PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
   },
 
   // ============================================================
-  // ⭐ ACTION‑MODULE
+  // ⭐ AKTIONEN — verändern nur pump/score/axles, rufen danach
+  // genau EINMAL sync() auf. Keine eigene Predict-/Metrik-Logik
+  // mehr in den einzelnen Aktionen.
   // ============================================================
   toggleAxle(i) {
     this.axles[i].active = !this.axles[i].active;
-    const active = this.axles.filter(a => a.active).length;
-    this.state.achse = active > 0 ? String.fromCharCode(64 + active) : '0';
-    this.state.root = active;
     this.log(`achse ${this.axles[i].name} → ${this.axles[i].active ? 'ON' : 'OFF'}`, 'info');
-    this.render();
-    this.triggerPredict();
+    this.sync();
   },
 
   pumpCycle() {
@@ -425,85 +344,49 @@ PREFETCH:${this.state.prefetchCount}  PREDICT:${this.state.predictCount}  CACHE:
       this.log('❗ keine achse aktiv — pump gestoppt', 'err');
       return;
     }
+    this.stations.forEach((st, i) => {
+      if ((this.state.pump + i) % 3 === 0) {
+        this.log(`🔷 STATION ${st} → BOOST`, 'ok');
+        this.state.score += (active * (i + 1));
+      }
+    });
     this.state.pump = Math.min(this.state.pump + active, 128);
     this.state.score += active * 2;
-    this.state.quote = Math.min(1, this.state.quote + 0.01);
-
-    const vals = [3,9,27,81,243,729];
-    const shift = this.state.pump % 6;
-    this.liveWindow = [
-      [vals[(shift)%6], vals[(shift+1)%6]],
-      [vals[(shift+2)%6], vals[(shift+3)%6]],
-      [vals[(shift+4)%6], vals[(shift+5)%6]]
-    ];
-
-    this.log(`💨 PUMP · stack=${this.state.pump} · score+${active*2}`, 'ok');
-    this.render();
-    this.triggerPredict();
-  },
-
-  triggerPredict() {
-    const active = this.axles.filter(a => a.active).length;
-    const quote = this.state.quote;
-
-    if (active > 0 && quote > 0.4) {
-      this.state.predict = 'ACTIVE';
-      this.state.cpuBias = quote > 0.6 ? 'FORWARD' : 'REVERSE';
-      this.state.cpuJump = active + Math.floor(this.state.pump / 10);
-
-      this.state.q = 3 * active + this.state.pump % 10;
-      this.state.d = 9 * active + Math.floor(this.state.pump / 5);
-      this.state.f = 27 * active + Math.floor(this.state.pump / 3);
-
-      this.state.root = active;
-      this.state.tmp = 128 - this.state.pump;
-
-      // ⭐ EINHEITLICHE TREFFERQUOTE: nur wenn cpuJump > 0
-      if (this.state.cpuJump > 0) {
-        this.memory.hits++;
-        this.state.predictCount++;  // Predict‑Zähler
-        this.memory.slides.push(active);
-        this.memory.jumps.push(this.state.cpuJump);
-      } else {
-        this.memory.misses++;
-      }
-      this.state.quote = (this.memory.hits + 1) / (this.memory.hits + this.memory.misses + 2);
-
-      this.log(`🧠 PREDICT · ${this.state.cpuBias} · sprung=${this.state.cpuJump} · quote=${Math.round(this.state.quote*100)}%`, 'warn');
-    } else {
-      this.state.predict = 'IDLE';
-      this.state.cpuJump = 0;
-      this.log('⏸ PREDICT · idle', 'info');
-    }
-    this.render();
+    this.log(`💨 PUMP · stack=${this.state.pump}`, 'ok');
+    this.sync();
   },
 
   runGeneral() {
     this.axles.forEach(a => a.active = true);
-    for (let i = 0; i < 3; i++) this.pumpCycle();
+    for (let i = 0; i < 3; i++) {
+      this.state.pump = Math.min(this.state.pump + 9, 128);
+      this.state.score += 9 * 2;
+    }
     this.state.score += 50;
     this.log('⚡ GENERAL RUN · alles aktiv · score+50', 'ok');
-    this.render();
-    this.triggerPredict();
+    this.sync();
   },
 
   toggleAll() {
     const allOn = this.axles.every(a => a.active);
     this.axles.forEach(a => a.active = !allOn);
     this.log(`🔄 ALL TOGGLE → ${allOn ? 'OFF' : 'ON'}`, 'info');
-    this.render();
-    this.triggerPredict();
+    this.sync();
   },
 
   randomize() {
     this.axles.forEach(a => a.active = Math.random() > 0.5);
     this.state.score = Math.floor(Math.random() * 500) + 500;
     this.state.pump = Math.floor(Math.random() * 30);
-    this.state.quote = 0.3 + Math.random() * 0.5;
-    this.state.cpuJump = Math.floor(Math.random() * 20);
     this.log('🎲 RANDOM · neuer zustand', 'warn');
-    this.render();
-    this.triggerPredict();
+    this.sync();
+  },
+
+  loopAll() {
+    this.axles.forEach(a => a.active = !a.active);
+    this.state.pump = Math.min(this.state.pump + this.axles.filter(a=>a.active).length, 128);
+    this.log('♾ LOOP-ALL · orbit complete', 'ok');
+    this.sync(); // genau EIN sync()/render(), nicht mehr drei
   },
 
   resetAll() {
@@ -516,27 +399,20 @@ PREFETCH:${this.state.prefetchCount}  PREDICT:${this.state.predictCount}  CACHE:
     this.memory = { hits: 0, misses: 0, slides: [], jumps: [] };
     this.liveWindow = [['3','9'], ['27','81'], ['243','729']];
     document.getElementById('consoleLog').innerHTML = '⏳ system zurückgesetzt...';
-    this.updateMetrics();
     this.log('⟲ RESET · komplett neu', 'ok');
     this.render();
   },
 
-  // ---------- INIT ----------
   init() {
     this.log('⭐ 3‑STERNE · GENERAL · PREFETCH · PREDICT · CACHE', 'ok');
-    this.log('📊 9 ACHSEN · 3×2 PREFETCH · MYSTERY Q/D/F', 'info');
-    this.log('💨 PUMP · CPU‑PREDICT · TREFFERQUOTE', 'info');
-    this.log('🌀 ORBIT‑FUSION · PUMP‑KERNEL · WINDOW‑ENGINE · LOOP‑ALL', 'ok');
+    this.log('📊 vereinheitlichte sync()-Logik für alle Aktionen', 'info');
     this.render();
-    this.updateMetrics();
-    setTimeout(() => this.triggerPredict(), 500);
     setInterval(() => {
       if (this.axles.some(a => a.active)) this.pumpCycle();
     }, 8000);
   }
 };
 
-// ---------- BUTTONS ----------
 document.getElementById('btnGeneral').addEventListener('click', () => engine.runGeneral());
 document.getElementById('btnReset').addEventListener('click', () => engine.resetAll());
 document.getElementById('btnToggleAll').addEventListener('click', () => engine.toggleAll());
@@ -544,7 +420,6 @@ document.getElementById('btnRandom').addEventListener('click', () => engine.rand
 document.getElementById('btnPump').addEventListener('click', () => engine.pumpCycle());
 document.getElementById('btnLoop').addEventListener('click', () => engine.loopAll());
 
-// ---------- START ----------
 engine.init();
 window.engine = engine;
 </script>
